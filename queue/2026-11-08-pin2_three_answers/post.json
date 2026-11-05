@@ -1,0 +1,12 @@
+{
+  "source": "posts/pin2_three_answers",
+  "post_on": "2026-11-08",
+  "approved": true,
+  "alt_text": [
+    "Cover: Half an answer vs a full one. The skill behind every explain-why question.",
+    "One example, our own Primary Science question: a circuit with a battery, a bulb, and a plastic ruler across a gap. Mei places a plastic ruler across the gap. The bulb does not light up. Explain why. 2 marks.",
+    "Answer A repeats the question and shows no science idea. Answer B says plastic is an electrical insulator, a correct idea, but stops before the current and the bulb.",
+    "Answer C gives the full chain: plastic is an insulator, no current flows through the ruler, the circuit is open, no current flows through the bulb, so the bulb does not light up.",
+    "A 3-step check for any explain question: name the key idea, link each step from cause to effect, end at what the question asked. Use it whenever you see explain why, give a reason, or how does something affect something."
+  ]
+}

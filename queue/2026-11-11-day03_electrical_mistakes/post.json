@@ -1,0 +1,11 @@
+{
+  "source": "posts/day03_electrical_mistakes",
+  "post_on": "2026-11-11",
+  "approved": true,
+  "alt_text": [
+    "Cover: 6 mistakes that cost marks, P5 Electrical System.",
+    "Mistakes 1 to 3: open switch means off, current is not used up, a bulb needs a full loop.",
+    "Mistakes 4 to 6: reversed battery, bulbs in parallel stay about as bright, give the cause then the effect.",
+    "Recap: the six fixes as a checklist."
+  ]
+}
