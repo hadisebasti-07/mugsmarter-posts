@@ -5,7 +5,7 @@ Publish dated posts to Instagram (Instagram API with Instagram Login).
 Usage:
   python3 publish.py next              # publish every approved item dated today (SGT), in folder order
   python3 publish.py next --dry-run    # show what would be posted, call nothing
-  python3 publish.py next --window     # same as next, but only 19:00–21:59 SGT
+  python3 publish.py next --window     # same as next, but only 20:00–22:59 SGT
   python3 publish.py next --catch-up   # also publish approved items from earlier days that were missed
   python3 publish.py check <item>      # create upload containers, never publish
   python3 publish.py refresh-token     # print a refreshed 60-day token
@@ -31,7 +31,7 @@ GRAPH = "https://graph.instagram.com/v21.0"
 QUEUE = Path(__file__).parent / "queue"
 MEDIA_EXT = {".jpg", ".jpeg", ".mp4", ".mov"}
 SGT = timezone(timedelta(hours=8))
-WINDOW = range(19, 22)  # SGT hours a scheduled (backup) run may post in
+WINDOW = range(20, 23)  # SGT hours a scheduled (backup) run may post in; main run is 20:30
 
 
 def token() -> str:
