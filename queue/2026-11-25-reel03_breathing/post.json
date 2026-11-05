@@ -3,5 +3,6 @@
   "post_on": "2026-11-25",
   "post_time": "12:30",
   "thumb_offset_ms": 500,
-  "approved": true
+  "approved": false,
+  "note": "Held until the Week 3 fact-check passes; then set approved: true."
 }
