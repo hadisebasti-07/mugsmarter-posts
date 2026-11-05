@@ -176,7 +176,13 @@ def cmd_next(dry: bool, window: bool, catch_up: bool) -> None:
     pending = [i for i in items() if meta(i).get("approved") and not meta(i).get("posted_at")]
     today = [i for i in pending if post_on(i) == now.date()]
     missed = [i for i in pending if post_on(i) < now.date()]
-    todo = (missed if catch_up else []) + today
+    if missed and not catch_up:
+        # posting today's item would put it ahead of the missed ones; hold everything.
+        # non-zero exit makes GitHub email the repo owner
+        sys.exit("Missed and still unposted: " + ", ".join(i.name for i in missed) +
+                 ". Nothing was posted. Run the workflow with catch_up ticked to post "
+                 "them, then today's, in date order.")
+    todo = missed + today
     if not todo:
         print(f"Nothing approved for {now.date()}, nothing to post.")
     for item in todo:
@@ -187,10 +193,6 @@ def cmd_next(dry: bool, window: bool, catch_up: bool) -> None:
             publish(item)
     if dry:
         print("(dry run, nothing posted)")
-    if missed and not catch_up:
-        # non-zero exit makes GitHub email the repo owner
-        sys.exit("Missed and still unposted: " + ", ".join(i.name for i in missed) +
-                 ". Run the workflow with catch_up ticked to post them now.")
     if not today and not missed and not any(post_on(i) > now.date() for i in pending):
         sys.exit("The queue is empty: nothing approved for today or later.")
 

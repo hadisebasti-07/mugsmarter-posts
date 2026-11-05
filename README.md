@@ -2,8 +2,8 @@
 
 Same setup as list.sg (see the Claude Doc "Automated Instagram Posting with GitHub Actions"), with these changes:
 
-- **Posts by date, daily.** Each item's `post.json` has `post_on` (from "Post on:" in `caption.md`). A run posts every approved, unposted item dated today (SGT), in folder order, so the three pins all go out on Sun 8 Nov.
-- **Missed days don't auto-post.** They make the run fail (GitHub emails you). Run the workflow with `catch_up` ticked to post them.
+- **Posts by date, daily.** Each item's `post.json` has `post_on` (from "Post on:" in `caption.md`). A run posts every approved, unposted item dated today (SGT), in folder order, so the three pins all go out together (Thu 5 Nov).
+- **A missed post blocks the ones after it.** The run posts nothing and fails, so GitHub emails you. Run the workflow with `catch_up` ticked to post everything in date order.
 - **Single-image posts** (the cheatsheets) are supported.
 - **Alt text** from `caption.md` is set on every image.
 
@@ -26,4 +26,4 @@ cron-job.org calls the workflow at 20:30 SGT **every day** (parents scroll after
 GitHub's own schedule runs hourly at 20:30, 21:30 and 22:30 SGT as a backup.
 Running more than once a day is safe, because posted items are skipped.
 
-Pinning is manual. After the 8 Nov posts go out, pin them in the order 3, then 2, then 1.
+Pinning is manual. After the pins go out (Thu 5 Nov), pin them in the order 3, then 2, then 1.
