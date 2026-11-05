@@ -2,6 +2,11 @@ name: Verify token (never posts)
 
 on:
   workflow_dispatch:
+    inputs:
+      item:
+        description: "Queue folder to test-upload (blank = today's items)"
+        type: string
+        default: ""
 
 jobs:
   verify:
@@ -17,9 +22,10 @@ jobs:
           u = "https://graph.instagram.com/v21.0/me?fields=username,account_type&access_token=" + os.environ["IG_ACCESS_TOKEN"]
           print(json.load(urllib.request.urlopen(u)))
           PY
-      - name: Test-upload today's items (creates containers, publishes nothing)
+      - name: Test-upload items (creates containers, publishes nothing)
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           MEDIA_BASE: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
         run: |
-          for d in queue/$(TZ=Asia/Singapore date +%F)-*/; do python3 publish.py check "$(basename "$d")"; done
+          if [ -n "${{ inputs.item }}" ]; then python3 publish.py check "${{ inputs.item }}"; exit; fi
+          for d in queue/$(TZ=Asia/Singapore date +%F)-*/; do [ -d "$d" ] && python3 publish.py check "$(basename "$d")"; done

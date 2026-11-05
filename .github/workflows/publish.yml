@@ -2,8 +2,8 @@ name: Publish today's post
 
 on:
   schedule:
-    - cron: "30 12-14 * * *"  # backup: hourly 20:30–22:30 SGT; --window keeps it to 20:00–22:59
-  workflow_dispatch:          # cron-job.org calls this at 20:30 SGT every day
+    - cron: "30 4-6,12-14 * * *"  # backup: hourly from 12:30 and 20:30 SGT; --window posts only items due in the last 3 h
+  workflow_dispatch:          # cron-job.org calls this at 12:30 and 20:30 SGT every day
     inputs:
       catch_up:
         description: "Also post approved items from earlier days that were missed"

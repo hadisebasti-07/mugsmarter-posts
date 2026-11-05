@@ -3,9 +3,9 @@
 Publish dated posts to Instagram (Instagram API with Instagram Login).
 
 Usage:
-  python3 publish.py next              # publish every approved item dated today (SGT), in folder order
+  python3 publish.py next              # publish every approved item dated today whose time (SGT) has come, in folder order
   python3 publish.py next --dry-run    # show what would be posted, call nothing
-  python3 publish.py next --window     # same as next, but only 20:00–22:59 SGT
+  python3 publish.py next --window     # same as next, but only items due in the last 3 hours (backup schedule)
   python3 publish.py next --catch-up   # also publish approved items from earlier days that were missed
   python3 publish.py check <item>      # create upload containers, never publish
   python3 publish.py refresh-token     # print a refreshed 60-day token
@@ -13,7 +13,8 @@ Usage:
 
 Env: IG_ACCESS_TOKEN, MEDIA_BASE (public URL of this repo's Pages site).
 Each queue/<item>/ holds 01..NN media (.jpg/.mp4), caption.txt, post.json
-({"post_on": "YYYY-MM-DD", "approved": true, "alt_text": [...]}).
+({"post_on": "YYYY-MM-DD", "post_time": "HH:MM" (SGT, default 20:30), "approved": true,
+  "alt_text": [...]}; a single .mp4 posts as a Reel, with optional "thumb_offset_ms" for its cover).
 An item is posted once: the workflow commits posted_at back, so reruns skip it.
 """
 
@@ -31,7 +32,8 @@ GRAPH = "https://graph.instagram.com/v21.0"
 QUEUE = Path(__file__).parent / "queue"
 MEDIA_EXT = {".jpg", ".jpeg", ".mp4", ".mov"}
 SGT = timezone(timedelta(hours=8))
-WINDOW = range(20, 23)  # SGT hours a scheduled (backup) run may post in; main run is 20:30
+DEFAULT_TIME = "20:30"  # SGT, when an item has no post_time
+WINDOW = timedelta(hours=3)  # a backup run posts an item only this long after its time
 
 
 def token() -> str:
@@ -70,6 +72,11 @@ def post_on(item: Path) -> date:
     return date.fromisoformat(meta(item)["post_on"])
 
 
+def due_at(item: Path) -> datetime:
+    t = datetime.strptime(meta(item).get("post_time", DEFAULT_TIME), "%H:%M").time()
+    return datetime.combine(post_on(item), t, tzinfo=SGT)
+
+
 def media_files(item: Path) -> list[Path]:
     return sorted(f for f in item.iterdir() if f.suffix.lower() in MEDIA_EXT)
 
@@ -103,6 +110,10 @@ def container(item: Path, f: Path, alt: str, carousel: bool, caption: str = "") 
     p = {"is_carousel_item": "true"} if carousel else {"caption": caption}
     if video:
         p.update(media_type="VIDEO" if carousel else "REELS", video_url=url)
+        if not carousel:
+            p.update(share_to_feed="true")
+            if "thumb_offset_ms" in meta(item):
+                p.update(thumb_offset=str(meta(item)["thumb_offset_ms"]))
     else:
         p.update(image_url=url)
         if alt:
@@ -164,17 +175,16 @@ def cmd_status() -> None:
             state = "MISSED"
         else:
             state = "due"
-        print(f"{m['post_on']}  {item.name:50} {len(media_files(item)):2} files  {state}")
+        print(f"{m['post_on']} {m.get('post_time', DEFAULT_TIME)}  {item.name:50} "
+              f"{len(media_files(item)):2} files  {state}")
 
 
 def cmd_next(dry: bool, window: bool, catch_up: bool) -> None:
     now = datetime.now(SGT)
-    if window and now.hour not in WINDOW:
-        # GitHub cron runs late, so the backup fires hourly and only posts in the window
-        print(f"{now:%H:%M} SGT is outside {WINDOW.start}:00–{WINDOW.stop}:00, skipping.")
-        return
     pending = [i for i in items() if meta(i).get("approved") and not meta(i).get("posted_at")]
-    today = [i for i in pending if post_on(i) == now.date()]
+    # GitHub's backup cron runs late, so it only posts items whose time passed in the last 3 h
+    today = [i for i in pending if post_on(i) == now.date() and due_at(i) <= now
+             and not (window and now - due_at(i) > WINDOW)]
     missed = [i for i in pending if post_on(i) < now.date()]
     if missed and not catch_up:
         # posting today's item would put it ahead of the missed ones; hold everything.
@@ -184,7 +194,7 @@ def cmd_next(dry: bool, window: bool, catch_up: bool) -> None:
                  "them, then today's, in date order.")
     todo = missed + today
     if not todo:
-        print(f"Nothing approved for {now.date()}, nothing to post.")
+        print(f"Nothing due at {now:%Y-%m-%d %H:%M} SGT, nothing to post.")
     for item in todo:
         print(f"Next: {item.name}")
         for f in media_files(item):
@@ -193,7 +203,7 @@ def cmd_next(dry: bool, window: bool, catch_up: bool) -> None:
             publish(item)
     if dry:
         print("(dry run, nothing posted)")
-    if not today and not missed and not any(post_on(i) > now.date() for i in pending):
+    if not today and not missed and not any(due_at(i) > now for i in pending):
         sys.exit("The queue is empty: nothing approved for today or later.")
 
 

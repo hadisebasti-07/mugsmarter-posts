@@ -6,6 +6,8 @@ Same setup as list.sg (see the Claude Doc "Automated Instagram Posting with GitH
 - **A missed post blocks the ones after it.** The run posts nothing and fails, so GitHub emails you. Run the workflow with `catch_up` ticked to post everything in date order.
 - **Single-image posts** (the cheatsheets) are supported.
 - **Alt text** from `caption.md` is set on every image.
+- **Per-post time.** `**Time:** HH:MM` in `caption.md` (SGT); default 20:30. Reels go out at 12:30.
+- **Reels.** A post folder with `reel.mp4` (instead of `slides/`) queues as a Reel; `**Cover:** 1.8 s` picks the cover frame.
 
 ## Add or refresh posts
 
@@ -22,8 +24,8 @@ To hold one back, set `"approved": false` in its `post.json` and push.
 
 ## Schedule
 
-cron-job.org calls the workflow at 20:30 SGT **every day** (parents scroll after dinner and homework) (URL, method and headers as in the doc).
-GitHub's own schedule runs hourly at 20:30, 21:30 and 22:30 SGT as a backup.
+cron-job.org calls the workflow at **12:30 and 20:30 SGT every day** (hours 12 and 20, minute 30; parents scroll at lunch and after dinner) (URL, method and headers as in the doc).
+GitHub's own schedule runs hourly after each (12:30–14:30, 20:30–22:30 SGT) as a backup, posting only items due in the last 3 hours.
 Running more than once a day is safe, because posted items are skipped.
 
 Pinning is manual. After the pins go out (Thu 5 Nov), pin them in the order 3, then 2, then 1.
