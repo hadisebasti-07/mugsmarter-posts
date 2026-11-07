@@ -24,8 +24,8 @@ To hold one back, set `"approved": false` in its `post.json` and push.
 
 ## Schedule
 
-cron-job.org calls the workflow at **12:30 and 20:30 SGT every day** (hours 12 and 20, minute 30; parents scroll at lunch and after dinner) (URL, method and headers as in the doc).
-GitHub's own schedule runs hourly after each (12:30–14:30, 20:30–22:30 SGT) as a backup, posting only items due in the last 3 hours.
+cron-job.org calls the workflow at **12:30, 18:30, 20:30 and 21:30 SGT every day** (hours 12, 18, 20, 21; minute 30). A run posts only what is due, so extra runs are harmless. Times are being tested (see ../posts/TIMING_TEST.md) (URL, method and headers as in the doc).
+GitHub's own schedule runs hourly (12:30–14:30, 18:30–23:30 SGT) as a backup, posting only items due in the last 3 hours.
 Running more than once a day is safe, because posted items are skipped.
 
 Pinning is manual. After the pins go out (Thu 5 Nov), pin them in the order 3, then 2, then 1.
