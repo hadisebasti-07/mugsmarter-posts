@@ -3,7 +3,7 @@ name: Publish today's post
 on:
   schedule:
     - cron: "30 4-6,10-15 * * *"  # backup: hourly 12:30–14:30 and 18:30–23:30 SGT; --window posts only items due in the last 3 h
-  workflow_dispatch:          # cron-job.org calls this at 12:30, 18:30, 20:30 and 21:30 SGT every day
+  workflow_dispatch:          # cron-job.org calls this at 12:30 and 20:30 SGT (the only slots that fire; 18:30 and 21:30 never did, found 17 Nov)
     inputs:
       catch_up:
         description: "Also post approved items from earlier days that were missed"
